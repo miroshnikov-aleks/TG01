@@ -4,7 +4,7 @@ from aiogram import Bot, Dispatcher, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 import asyncio
-from config import API_TOKEN, WEATHER_API_KEY  # Импортируем токены из config.py
+from config import API_TOKEN, WEATHER_API_KEY
 
 CITY_NAME = 'Брянск'
 
@@ -17,10 +17,25 @@ storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 router = Router()
 
+# Словарь для перевода описаний погоды
+weather_descriptions = {
+    "clear sky": "ясное небо",
+    "few clouds": "малооблачно",
+    "scattered clouds": "рассеянные облака",
+    "broken clouds": "облачность с прояснениями",
+    "overcast clouds": "пасмурно",
+    "light rain": "небольшой дождь",
+    "moderate rain": "умеренный дождь",
+    "heavy intensity rain": "сильный дождь",
+    "thunderstorm": "гроза",
+    "snow": "снег",
+    # Добавьте другие описания по мере необходимости
+}
+
 # Команда /start
 @router.message(Command(commands=['start']))
 async def send_welcome(message: types.Message):
-    logging.info("Received /start command")
+    logging.info("Получена команда /start")
     await message.answer(
         "Привет! Я бот, который может предоставить прогноз погоды. Напиши /weather, чтобы получить прогноз.",
         parse_mode="HTML"
@@ -29,7 +44,7 @@ async def send_welcome(message: types.Message):
 # Команда /help
 @router.message(Command(commands=['help']))
 async def send_help(message: types.Message):
-    logging.info("Received /help command")
+    logging.info("Получена команда /help")
     await message.answer(
         "Я могу помочь тебе с прогнозом погоды.\n\nКоманды:\n/start - Начать работу с ботом\n/help - Получить справку\n/weather - Получить прогноз погоды",
         parse_mode="HTML"
@@ -38,7 +53,7 @@ async def send_help(message: types.Message):
 # Команда /weather
 @router.message(Command(commands=['weather']))
 async def get_weather(message: types.Message):
-    logging.info("Received /weather command")
+    logging.info("Получена команда /weather")
     try:
         response = requests.get(
             f'http://api.openweathermap.org/data/2.5/weather?q={CITY_NAME}&appid={WEATHER_API_KEY}&units=metric',
@@ -47,10 +62,11 @@ async def get_weather(message: types.Message):
         data = response.json()
         temperature = data['main']['temp']
         weather_description = data['weather'][0]['description']
-        weather_info = f"Погода в {CITY_NAME}:\nТемпература: {temperature}°C\nОписание: {weather_description.capitalize()}"
+        translated_description = weather_descriptions.get(weather_description, weather_description)
+        weather_info = f"Погода в {CITY_NAME}:\nТемпература: {temperature}°C\nОписание: {translated_description.capitalize()}"
         await message.answer(weather_info, parse_mode="HTML")
     except Exception as e:
-        logging.error(f"Error fetching weather data: {e}")
+        logging.error(f"Ошибка при получении данных о погоде: {e}")
         await message.answer("Не удалось получить данные о погоде. Попробуйте позже.")
 
 # Добавление маршрутизатора в диспетчер
@@ -61,7 +77,7 @@ async def main():
     try:
         await dp.start_polling(bot)
     except Exception as e:
-        logging.error(f"Error starting polling: {e}")
+        logging.error(f"Ошибка при запуске поллинга: {e}")
 
 if __name__ == '__main__':
     asyncio.run(main())
