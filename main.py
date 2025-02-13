@@ -63,7 +63,7 @@ async def get_weather(message: types.Message):
         temperature = data['main']['temp']
         weather_description = data['weather'][0]['description']
         translated_description = weather_descriptions.get(weather_description, weather_description)
-        weather_info = f"Погода в {CITY_NAME}:\nТемпература: {temperature}°C\nОписание: {translated_description.capitalize()}"
+        weather_info = f"Погода в {CITY_NAME}е:\nТемпература: {temperature}°C\nОписание: {translated_description.capitalize()}"
         await message.answer(weather_info, parse_mode="HTML")
     except Exception as e:
         logging.error(f"Ошибка при получении данных о погоде: {e}")
