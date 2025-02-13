@@ -6,7 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 import asyncio
 from config import API_TOKEN, WEATHER_API_KEY  # Импортируем токены из config.py
 
-CITY_NAME = 'Bryansk'
+CITY_NAME = 'Брянск'
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
