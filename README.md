@@ -1,6 +1,6 @@
 # TG01
  
-# Telegram Weather Bot
+# Погодный бот Telegram
 
 Этот проект представляет собой Telegram-бота, который предоставляет прогноз погоды для города Брянск, используя API OpenWeatherMap.
 
